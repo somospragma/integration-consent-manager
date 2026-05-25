@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'developer-portal/**'
-      - 'API-*/openapi.yaml'
+      - 'apis/*/openapi.yaml'
 
   workflow_dispatch:
 
@@ -24,10 +24,17 @@ jobs:
       - name: Copy OpenAPI specs to portal
         run: |
           mkdir -p developer-portal/specs
-          cp API-consent-lifecycle/openapi.yaml developer-portal/specs/consent-lifecycle.yaml
-          cp API-consent-authorization/openapi.yaml developer-portal/specs/consent-authorization.yaml
-          cp API-consent-query/openapi.yaml developer-portal/specs/consent-query.yaml
-          cp API-consent-admin/openapi.yaml developer-portal/specs/consent-admin.yaml
+          cp apis/API-consent-lifecycle/openapi.yaml developer-portal/specs/consent-lifecycle.yaml
+          cp apis/API-consent-authorization/openapi.yaml developer-portal/specs/consent-authorization.yaml
+          cp apis/API-consent-query/openapi.yaml developer-portal/specs/consent-query.yaml
+          cp apis/API-consent-admin/openapi.yaml developer-portal/specs/consent-admin.yaml
+          cp apis/API-webhook-management/openapi.yaml developer-portal/specs/webhook-management.yaml
+          cp apis/API-permission-catalog/openapi.yaml developer-portal/specs/permission-catalog.yaml
+          cp apis/API-audit/openapi.yaml developer-portal/specs/audit.yaml
+          cp apis/API-consent-flow/openapi.yaml developer-portal/specs/consent-flow.yaml
+          cp apis/API-payment-consent-flow/openapi.yaml developer-portal/specs/payment-consent-flow.yaml
+          cp apis/API-authorization-server/openapi.yaml developer-portal/specs/authorization-server.yaml
+          cp apis/API-client-registration/openapi.yaml developer-portal/specs/client-registration.yaml
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
