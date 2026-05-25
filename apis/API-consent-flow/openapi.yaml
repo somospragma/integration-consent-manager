@@ -1,0 +1,209 @@
+openapi: 3.1.0
+info:
+  title: Consent Flow Orchestrator API
+  description: |
+    Orquestador del flujo de consentimiento de cuentas (Account Access).
+    BIAN Domain: Customer Access Entitlement.
+    Implementa Saga pattern con compensaciones.
+  version: 1.0.0
+  contact:
+    name: Integration Chapter - Pragma
+
+servers:
+  - url: https://api.openfinance.example.com/v1
+
+security:
+  - BearerAuth: []
+  - mTLS: []
+
+paths:
+  /consent-flows:
+    post:
+      operationId: initiateConsentFlow
+      summary: Iniciar flujo de consentimiento de cuentas
+      tags: [Consent Flow]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitiateFlowRequest'
+      responses:
+        '201':
+          description: Flujo iniciado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentFlowResponse'
+
+  /consent-flows/{flowId}:
+    get:
+      operationId: getFlowStatus
+      summary: Consultar estado del flujo
+      tags: [Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentFlowResponse'
+        '404':
+          description: Flujo no encontrado
+
+  /consent-flows/{flowId}/authorize:
+    post:
+      operationId: authorizeFlow
+      summary: Usuario autorizó el consentimiento (post-SCA)
+      tags: [Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizeFlowRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentFlowResponse'
+
+  /consent-flows/{flowId}/reject:
+    post:
+      operationId: rejectFlow
+      summary: Usuario rechazó el consentimiento
+      tags: [Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  enum: [USER_REJECTED, TIMEOUT, CANCELLED]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentFlowResponse'
+
+  /consent-flows/{flowId}/token:
+    post:
+      operationId: exchangeToken
+      summary: Intercambiar authorization code por token
+      tags: [Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, codeVerifier]
+              properties:
+                code:
+                  type: string
+                codeVerifier:
+                  type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentFlowResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    mTLS:
+      type: mutualTLS
+
+  parameters:
+    FlowId:
+      name: flowId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    InitiateFlowRequest:
+      type: object
+      required: [redirectUri, consentType, permissions]
+      properties:
+        redirectUri:
+          type: string
+          format: uri
+        consentType:
+          type: string
+          enum: [ACCOUNTS]
+        permissions:
+          type: array
+          items:
+            type: string
+        expiresAt:
+          type: string
+          format: date-time
+
+    AuthorizeFlowRequest:
+      type: object
+      required: [userId, accountIds]
+      properties:
+        userId:
+          type: string
+        accountIds:
+          type: array
+          items:
+            type: string
+        authMethod:
+          type: string
+          enum: [SCA_BIOMETRIC, SCA_OTP, SCA_PUSH]
+
+    ConsentFlowResponse:
+      type: object
+      properties:
+        flowId:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+            - INITIATED
+            - PAR_SUBMITTED
+            - AWAITING_USER_AUTH
+            - SCA_COMPLETED
+            - CONSENT_AUTHORIZED
+            - CODE_ISSUED
+            - TOKEN_ISSUED
+            - COMPLETED
+            - USER_REJECTED
+            - SCA_TIMEOUT
+            - FAILED
+        consentId:
+          type: string
+          format: uuid
+        requestUri:
+          type: string
+        redirectUri:
+          type: string
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        failureReason:
+          type: string

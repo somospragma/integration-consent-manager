@@ -1,0 +1,169 @@
+openapi: 3.1.0
+info:
+  title: Dynamic Client Registration API
+  description: |
+    Registro dinámico de TPPs (DCR) según RFC 7591.
+    BIAN Domain: Party Authentication.
+    TPPs se registran con Software Statement Assertion del directorio.
+  version: 1.0.0
+  contact:
+    name: Integration Chapter - Pragma
+
+servers:
+  - url: https://auth.openfinance.example.com
+
+security:
+  - mTLS: []
+
+paths:
+  /register:
+    post:
+      operationId: registerClient
+      summary: Registrar nuevo TPP
+      tags: [Client Registration]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        '201':
+          description: Client registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+        '400':
+          description: Invalid SSA or configuration
+
+  /register/{clientId}:
+    get:
+      operationId: getClient
+      summary: Obtener configuración del cliente
+      tags: [Client Registration]
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - RegistrationToken: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+    put:
+      operationId: updateClient
+      summary: Actualizar configuración
+      tags: [Client Registration]
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - RegistrationToken: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+    delete:
+      operationId: deleteClient
+      summary: Eliminar registro
+      tags: [Client Registration]
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - RegistrationToken: []
+      responses:
+        '204':
+          description: Client deleted
+
+components:
+  securitySchemes:
+    mTLS:
+      type: mutualTLS
+    RegistrationToken:
+      type: http
+      scheme: bearer
+      description: Registration access token (returned on creation)
+
+  schemas:
+    RegistrationRequest:
+      type: object
+      required: [software_statement, redirect_uris]
+      properties:
+        software_statement:
+          type: string
+          description: JWT firmado por el directorio central (SSA)
+        redirect_uris:
+          type: array
+          items:
+            type: string
+            format: uri
+        token_endpoint_auth_method:
+          type: string
+          enum: [private_key_jwt, tls_client_auth]
+          default: private_key_jwt
+        grant_types:
+          type: array
+          items:
+            type: string
+            enum: [authorization_code, client_credentials, refresh_token]
+        response_types:
+          type: array
+          items:
+            type: string
+            enum: [code]
+        scope:
+          type: string
+          description: "Scopes solicitados (openid accounts payments)"
+        id_token_signed_response_alg:
+          type: string
+          enum: [PS256, ES256]
+        request_object_signing_alg:
+          type: string
+          enum: [PS256, ES256]
+
+    RegistrationResponse:
+      type: object
+      properties:
+        client_id:
+          type: string
+        client_id_issued_at:
+          type: integer
+        token_endpoint_auth_method:
+          type: string
+        grant_types:
+          type: array
+          items:
+            type: string
+        redirect_uris:
+          type: array
+          items:
+            type: string
+        scope:
+          type: string
+        software_id:
+          type: string
+        software_statement:
+          type: string
+        registration_access_token:
+          type: string
+          description: Token para GET/PUT/DELETE del registro

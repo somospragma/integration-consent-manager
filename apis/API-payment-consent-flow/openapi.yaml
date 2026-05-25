@@ -1,0 +1,243 @@
+openapi: 3.1.0
+info:
+  title: Payment Consent Flow Orchestrator API
+  description: |
+    Orquestador del flujo de consentimiento de pagos.
+    BIAN Domain: Payment Initiation + Customer Access Entitlement.
+    ISO 20022 aligned data model (pain.001).
+    Consent single-use: se consume después de ejecutar el pago.
+  version: 1.0.0
+  contact:
+    name: Integration Chapter - Pragma
+
+servers:
+  - url: https://api.openfinance.example.com/v1
+
+security:
+  - BearerAuth: []
+  - mTLS: []
+
+paths:
+  /payment-consent-flows:
+    post:
+      operationId: initiatePaymentFlow
+      summary: Iniciar flujo de consentimiento de pago
+      tags: [Payment Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/XIdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InitiatePaymentRequest'
+      responses:
+        '201':
+          description: Flujo de pago iniciado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentFlowResponse'
+
+  /payment-consent-flows/{flowId}:
+    get:
+      operationId: getPaymentFlowStatus
+      summary: Consultar estado del flujo de pago
+      tags: [Payment Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentFlowResponse'
+
+  /payment-consent-flows/{flowId}/authorize:
+    post:
+      operationId: authorizePayment
+      summary: Usuario autorizó el pago (SCA obligatoria)
+      tags: [Payment Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorizePaymentRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentFlowResponse'
+
+  /payment-consent-flows/{flowId}/check-funds:
+    post:
+      operationId: checkFunds
+      summary: Verificar disponibilidad de fondos
+      tags: [Payment Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentFlowResponse'
+
+  /payment-consent-flows/{flowId}/execute:
+    post:
+      operationId: executePayment
+      summary: Ejecutar el pago
+      tags: [Payment Consent Flow]
+      parameters:
+        - $ref: '#/components/parameters/FlowId'
+        - $ref: '#/components/parameters/XIdempotencyKey'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentFlowResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    mTLS:
+      type: mutualTLS
+
+  parameters:
+    FlowId:
+      name: flowId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    XIdempotencyKey:
+      name: X-Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    InitiatePaymentRequest:
+      type: object
+      required: [redirectUri, amount, currency, creditorAccount]
+      properties:
+        redirectUri:
+          type: string
+          format: uri
+        amount:
+          type: string
+          pattern: '^\d+\.\d{2}$'
+          description: "ISO 20022 ActiveCurrencyAndAmount (2 decimals)"
+          example: "165.88"
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          description: "ISO 4217 CurrencyCode"
+          example: "COP"
+        creditorAccount:
+          $ref: '#/components/schemas/AccountIdentification'
+        creditorName:
+          type: string
+          maxLength: 140
+        debtorAccount:
+          $ref: '#/components/schemas/AccountIdentification'
+        remittanceReference:
+          type: string
+          maxLength: 140
+          description: "ISO 20022 RemittanceInformation (max 140 chars)"
+        paymentType:
+          type: string
+          enum: [DOMESTIC, INTERNATIONAL, SCHEDULED]
+          default: DOMESTIC
+
+    AuthorizePaymentRequest:
+      type: object
+      required: [userId, debtorAccountId, authMethod]
+      properties:
+        userId:
+          type: string
+        debtorAccountId:
+          type: string
+        authMethod:
+          type: string
+          enum: [SCA_BIOMETRIC, SCA_OTP, SCA_PUSH]
+          description: "SCA siempre obligatoria para pagos"
+
+    AccountIdentification:
+      type: object
+      description: "ISO 20022 AccountIdentification"
+      required: [identification]
+      properties:
+        schemeName:
+          type: string
+          enum: [CO.CBB.AccountNumber, IBAN, BBAN]
+          description: "Scheme de identificación de cuenta"
+        identification:
+          type: string
+          maxLength: 34
+        name:
+          type: string
+          maxLength: 140
+
+    PaymentFlowResponse:
+      type: object
+      properties:
+        flowId:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum:
+            - INITIATED
+            - PAR_SUBMITTED
+            - AWAITING_USER_AUTH
+            - SCA_COMPLETED
+            - CONSENT_AUTHORIZED
+            - TOKEN_ISSUED
+            - FUNDS_CHECK_IN_PROGRESS
+            - FUNDS_CONFIRMED
+            - FUNDS_INSUFFICIENT
+            - PAYMENT_EXECUTING
+            - PAYMENT_ACCEPTED
+            - PAYMENT_COMPLETED
+            - PAYMENT_REJECTED
+            - CONSENT_CONSUMED
+            - COMPLETED
+            - USER_REJECTED
+            - SCA_TIMEOUT
+            - FAILED
+        consentId:
+          type: string
+          format: uuid
+        paymentId:
+          type: string
+        paymentStatus:
+          type: string
+        transactionId:
+          type: string
+        amount:
+          type: string
+        currency:
+          type: string
+        fundsAvailable:
+          type: boolean
+        startedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        failureReason:
+          type: string

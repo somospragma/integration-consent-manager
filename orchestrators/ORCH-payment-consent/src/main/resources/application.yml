@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: orch-payment-consent
+
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+  port: 8080
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: orch-payment-consent
+
+# Service URLs
+services:
+  consent-manager:
+    url: ${CONSENT_MANAGER_URL:http://ms-consent-engine:8080}
+  authorization-server:
+    url: ${AUTH_SERVER_URL:http://authorization-server:8080}
+  payment-initiation:
+    url: ${PAYMENT_SERVICE_URL:http://payment-initiation:8080}
+
+# Resilience4j
+resilience4j:
+  circuitbreaker:
+    instances:
+      consentManager:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+      paymentService:
+        slidingWindowSize: 5
+        failureRateThreshold: 30
+        waitDurationInOpenState: 60s
+  retry:
+    instances:
+      consentManager:
+        maxAttempts: 3
+        waitDuration: 1s
+      paymentService:
+        maxAttempts: 2
+        waitDuration: 2s

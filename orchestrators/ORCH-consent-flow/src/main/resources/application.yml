@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: orch-consent-flow
+
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+  port: 8080
+
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  metrics:
+    tags:
+      application: orch-consent-flow
+
+# Service URLs
+services:
+  consent-manager:
+    url: ${CONSENT_MANAGER_URL:http://ms-consent-engine:8080}
+  authorization-server:
+    url: ${AUTH_SERVER_URL:http://authorization-server:8080}
+
+# Flow configuration
+flow:
+  sca-timeout-seconds: ${FLOW_SCA_TIMEOUT_SECONDS:300}
+  auth-code-ttl-seconds: ${FLOW_AUTH_CODE_TTL_SECONDS:60}
+  max-retries: ${FLOW_MAX_RETRIES:3}
+
+# Resilience4j
+resilience4j:
+  circuitbreaker:
+    instances:
+      consentManager:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+      authServer:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+  retry:
+    instances:
+      consentManager:
+        maxAttempts: 3
+        waitDuration: 1s
+        exponentialBackoffMultiplier: 2
+      authServer:
+        maxAttempts: 3
+        waitDuration: 1s
+        exponentialBackoffMultiplier: 2

@@ -1,0 +1,42 @@
+name: Deploy Developer Portal to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'developer-portal/**'
+      - 'API-*/openapi.yaml'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Copy OpenAPI specs to portal
+        run: |
+          mkdir -p developer-portal/specs
+          cp API-consent-lifecycle/openapi.yaml developer-portal/specs/consent-lifecycle.yaml
+          cp API-consent-authorization/openapi.yaml developer-portal/specs/consent-authorization.yaml
+          cp API-consent-query/openapi.yaml developer-portal/specs/consent-query.yaml
+          cp API-consent-admin/openapi.yaml developer-portal/specs/consent-admin.yaml
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: developer-portal
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
