@@ -99,20 +99,6 @@ graph TB
 
 Portal interactivo con Swagger UI para probar las APIs directamente.
 
-```bash
-# 1. Levantar dependencias
-docker compose up -d
-
-# 2. Compilar
-cd services/MS-consent-engine && mvn clean package -DskipTests
-
-# 3. Ejecutar
-java -jar target/ms-consent-engine-1.0.0-SNAPSHOT.jar
-
-# 4. Probar
-curl http://localhost:8080/actuator/health
-```
-
 ## Tecnologías
 
 | Componente | Tecnología |

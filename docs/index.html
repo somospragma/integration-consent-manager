@@ -120,6 +120,51 @@
         .provider strong { font-size: 0.75rem; color: var(--pragma-purple); display: block; }
         .provider span { font-size: 0.62rem; color: #888; }
 
+        /* Architecture section */
+        .arch-section { margin-bottom: 24px; }
+        .arch-section h3 { font-size: 0.88rem; margin-bottom: 16px; color: var(--pragma-purple-dark); }
+        .arch-diagram {
+            background: var(--pragma-white);
+            border: 1px solid var(--pragma-accent-1);
+            border-radius: 10px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .arch-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .arch-arrow { text-align: center; color: var(--pragma-purple); font-size: 1.2rem; margin: 8px 0; }
+        .arch-node {
+            padding: 12px 16px;
+            border-radius: 50%;
+            width: 90px; height: 90px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 600; text-align: center;
+        }
+        .arch-node span { font-size: 0.6rem; font-weight: 400; opacity: 0.7; margin-top: 2px; }
+        .actor-tpp { background: var(--pragma-accent-2); color: var(--pragma-purple-dark); }
+        .actor-user { background: #e8f5e9; color: #2e7d32; }
+        .actor-admin { background: #fff3e0; color: #e65100; }
+        .arch-box {
+            flex: 1; min-width: 200px;
+            border-radius: 8px; padding: 14px;
+            text-align: center;
+        }
+        .arch-box strong { display: block; font-size: 0.78rem; margin-bottom: 6px; }
+        .arch-box span { display: block; font-size: 0.65rem; color: #555; padding: 2px 0; }
+        .api-ext { background: var(--pragma-accent-2); border: 1px solid var(--pragma-purple); }
+        .api-ext strong { color: var(--pragma-purple-dark); }
+        .api-int { background: #fff3e0; border: 1px solid #e65100; }
+        .api-int strong { color: #e65100; }
+        .ms-box { background: var(--pragma-accent-3); border: 1px solid var(--pragma-purple-light); }
+        .ms-box strong { color: var(--pragma-purple); }
+        .infra-box { background: var(--pragma-accent-1); border: 1px solid #999; }
+        .infra-box strong { color: var(--pragma-black); }
+        .arch-roles { margin-top: 12px; }
+        .arch-roles table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+        .arch-roles th { background: var(--pragma-purple-dark); color: white; padding: 8px; text-align: left; }
+        .arch-roles td { padding: 6px 8px; border-bottom: 1px solid var(--pragma-accent-1); }
+        .arch-roles tr:hover { background: var(--pragma-accent-4); }
+
         /* Footer */
         .portal-footer {
             background: var(--pragma-black);
@@ -146,49 +191,23 @@
     <!-- LANDING PAGE -->
     <div id="landing-page">
         <div class="landing-content">
-            <div class="landing-grid">
-                <div class="landing-card">
-                    <h3>🚀 Getting Started</h3>
-                    <p>Registra tu entidad, obtén certificados y client_id para empezar a integrar.</p>
-                    <ul>
-                        <li>1. Registro en Directorio Central (Raidiam)</li>
-                        <li>2. Obtener certificado mTLS</li>
-                        <li>3. Dynamic Client Registration</li>
-                        <li>4. Obtener token (client_credentials)</li>
-                    </ul>
-                </div>
-                <div class="landing-card">
-                    <h3>🔑 Seguridad</h3>
-                    <p>FAPI 2.0 con proveedores certificados.</p>
-                    <ul>
-                        <li>Auth Server: Authlete / Curity / Cloudentity / Ping</li>
-                        <li>SCA: Transmit Security (biometrics, passkeys)</li>
-                        <li>KYC: ConnectID (identity verification)</li>
-                        <li>Directory: Raidiam (PKI + trust framework)</li>
-                    </ul>
-                </div>
-                <div class="landing-card">
-                    <h3>🔄 Flujo de Consentimiento</h3>
-                    <p>Paso a paso para obtener acceso a datos del usuario.</p>
-                    <ul>
-                        <li>1. POST /consents (crear)</li>
-                        <li>2. PAR + Authorize (SCA)</li>
-                        <li>3. POST /token (obtener access)</li>
-                        <li>4. GET /accounts (consumir)</li>
-                    </ul>
-                </div>
-                <div class="landing-card">
-                    <h3>📦 APIs Disponibles</h3>
-                    <p>9 APIs con 49+ endpoints listos para probar.</p>
-                    <ul>
-                        <li>Consent Lifecycle (CRUD)</li>
-                        <li>Query, Webhooks, Permissions</li>
-                        <li>Admin, Audit</li>
-                        <li>Authorization Server + DCR</li>
-                    </ul>
+        <!-- Hero section -->
+            <div class="hero-section">
+                <h2>Consent Manager para Open Finance</h2>
+                <p>Motor de consentimiento que permite a entidades financieras gestionar la autorización del usuario para compartir su información con terceros, cumpliendo con el Decreto 0368/2026 y estándares internacionales.</p>
+            </div>
+            <div class="providers-section"">
+                <h3>✅ Consent Manager</h3>
+                <div class="providers-grid">
+                    <div class="provider"><strong>🔐Consentimiento</strong><span>El usuario decide qué datos comparte, con quién y por cuánto tiempo</span></div>
+                    <div class="provider"><strong>⚡Ciclo de vida</strong><span>Crear, autorizar, consultar, revocar y expirar consentimientos</span></div>
+                    <div class="provider"><strong>🛡️Seguridad</strong><span>mTLS, FAPI 2.0, tokens vinculados a certificado, SCA obligatoria</span></div>
+                    <div class="provider"><strong>📋Auditoria</strong><span>Logs inmutables con hash encadenado, retención 5 años, exportable</span></div>
+                    <div class="provider"><strong>🔔Notificacion</strong><span>Enterprise IAM</span></div>
+                    <div class="provider"><strong>☁️Multi-Nube</strong><span>Desplegable en AWS, Azure o GCP con Terraform</span></div>
                 </div>
             </div>
-
+        
             <div class="providers-section">
                 <h3>🏗️ Ecosistema de Proveedores Integrados</h3>
                 <div class="providers-grid">
@@ -199,6 +218,75 @@
                     <div class="provider"><strong>Ping Identity</strong><span>Enterprise IAM</span></div>
                     <div class="provider"><strong>Transmit Security</strong><span>Biometrics + Passkeys</span></div>
                     <div class="provider"><strong>ConnectID</strong><span>Identity Verification</span></div>
+                </div>
+            </div>
+
+            <!-- ARQUITECTURA -->
+            <div class="arch-section">
+                <h3>🏛️ Arquitectura del Consent Manager</h3>
+                <div class="arch-diagram">
+                    <pre class="mermaid">
+graph TB
+    subgraph Actores
+        TPP[TPP - Fintech/Banco]
+        USER[Usuario Final]
+        ADMIN[Administrador]
+    end
+    subgraph Consent Manager
+        subgraph APIs Externas
+            A1[API Consent Lifecycle]
+            A2[API Consent Query]
+            A3[API Webhooks]
+            A4[API Permissions]
+        end
+        subgraph APIs Internas
+            A5[API Authorization]
+            A6[API Admin]
+            A7[API Audit]
+        end
+        subgraph Microservicios
+            MS1[MS Consent Engine]
+            MS2[MS Audit Trail]
+            MS3[MS Notifications]
+            MS4[MS Permission Registry]
+            MS5[MS Authorization Server]
+        end
+    end
+    subgraph Infraestructura
+        DB[(PostgreSQL)]
+        CACHE[(Redis)]
+        KAFKA[Kafka]
+    end
+    TPP -->|Crear/Consultar/Revocar| A1
+    TPP -->|Buscar consents| A2
+    TPP -->|Registrar callbacks| A3
+    TPP -->|Ver permisos| A4
+    USER -->|Autorizar/Rechazar| A5
+    ADMIN -->|Gestionar/Monitorear| A6
+    ADMIN -->|Auditar| A7
+    A1 --> MS1
+    A2 --> MS1
+    A3 --> MS3
+    A4 --> MS4
+    A5 --> MS1
+    A5 --> MS5
+    A6 --> MS1
+    A7 --> MS2
+    MS1 --> DB
+    MS1 --> CACHE
+    MS1 --> KAFKA
+    MS2 --> DB
+    MS3 --> KAFKA
+    MS5 --> CACHE
+                    </pre>
+                </div>
+                <div class="arch-roles">
+                    <table>
+                        <tr><th>Actor</th><th>Acciones</th><th>APIs</th></tr>
+                        <tr><td><strong>TPP</strong></td><td>Crear, consultar, revocar consents</td><td>Lifecycle, Query, Webhooks, Permissions</td></tr>
+                        <tr><td><strong>Usuario</strong></td><td>Autorizar o rechazar consents</td><td>Authorization (via Auth Server)</td></tr>
+                        <tr><td><strong>Admin</strong></td><td>Gestionar, monitorear, auditar</td><td>Admin, Audit</td></tr>
+                    </table>
                 </div>
             </div>
 
@@ -227,6 +315,8 @@
         Pragma — Integration Chapter | Open Finance Colombia | BIAN v11 • ISO 20022 • FAPI 2.0 • Decreto 0368/2026
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad: true, theme: 'default'});</script>
     <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
     <script>
         const tabs = document.querySelectorAll('.tab');
