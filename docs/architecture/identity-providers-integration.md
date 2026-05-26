@@ -9,19 +9,19 @@ El Consent Manager se integra con proveedores especializados de identidad, autor
 ```mermaid
 graph TB
     subgraph "Trust Framework & Directory"
-        RAIDIAM[Raidiam\nDirectorio Central + PKI + DCR]
+        RAIDIAM[Raidiam - Directorio Central + PKI + DCR]
     end
 
     subgraph "Authorization Server (FAPI 2.0)"
-        AUTHLETE[Authlete\nAuth Server as-a-Service]
-        CURITY[Curity Identity Server\nOn-premise / Cloud]
-        CLOUDENTITY[Cloudentity\nAuthorization + Consent]
-        PING[Ping Identity\nEnterprise IAM + FAPI]
+        AUTHLETE[Authlete - Auth Server as-a-Service]
+        CURITY[Curity Identity Server - On-premise / Cloud]
+        CLOUDENTITY[Cloudentity - Authorization + Consent]
+        PING[Ping Identity - Enterprise IAM + FAPI]
     end
 
     subgraph "Identity & Authentication (SCA)"
-        TRANSMIT[Transmit Security / Mosaic\nPasswordless + Biometrics]
-        CONNECTID[ConnectID\nIdentity Verification]
+        TRANSMIT[Transmit Security / Mosaic - Passwordless + Biometrics]
+        CONNECTID[ConnectID - Identity Verification]
     end
 
     subgraph "Consent Manager (Pragma)"

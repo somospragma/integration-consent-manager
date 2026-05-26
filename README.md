@@ -37,41 +37,6 @@ Alineado con:
 └──────────────────────────────────────────────────────────────┘
 ```
 
-## Estructura del Repositorio
-
-```
-├── docs/                        # Documentación completa
-│   ├── architecture/            # Diagramas, API management, auth server, costos
-│   ├── adrs/                    # Architecture Decision Records
-│   ├── security/                # Modelo de seguridad FAPI 2.0
-│   ├── services/                # Catálogo de APIs, definición de servicios
-│   └── proposals/               # Propuestas de negocio
-├── apis/                        # OpenAPI 3.1 Specs (11 APIs)
-│   ├── API-consent-lifecycle/
-│   ├── API-consent-query/
-│   ├── API-webhook-management/
-│   ├── API-permission-catalog/
-│   ├── API-consent-authorization/
-│   ├── API-consent-admin/
-│   ├── API-audit/
-│   ├── API-consent-flow/
-│   ├── API-payment-consent-flow/
-│   ├── API-authorization-server/
-│   └── API-client-registration/
-├── services/                    # Microservicios (Java 21 + Spring Boot)
-│   ├── MS-consent-engine/
-│   ├── MS-audit-trail/
-│   ├── MS-notification-dispatcher/
-│   ├── MS-permission-registry/
-│   └── MS-authorization-server/
-├── orchestrators/               # Orquestadores (Saga pattern)
-│   ├── ORCH-consent-flow/
-│   └── ORCH-payment-consent/
-├── infrastructure/              # Terraform (AWS, costo-eficiente)
-├── developer-portal/            # Portal interactivo (Swagger UI)
-└── docker-compose.yml           # Desarrollo local
-```
-
 ## Proveedores Integrados
 
 | Herramienta | Rol |

@@ -39,7 +39,7 @@ El servicio de Agregación de Cuentas permite a un AISP (Account Information Ser
 graph TB
     subgraph "Account Aggregation Services"
         subgraph "Consent Service"
-            AAC[Account Access Consent\nCrear, consultar, revocar]
+            AAC[Account Access Consent - Crear, consultar, revocar]
         end
 
         subgraph "Account Information Resources"
@@ -57,9 +57,9 @@ graph TB
         end
 
         subgraph "Aggregation Services"
-            AGG[Multi-Bank Aggregator\nConsolidar de múltiples bancos]
-            CACHE[Cache Service\nDatos recientes en cache]
-            NORM[Normalizer\nNormalizar formatos entre bancos]
+            AGG[Multi-Bank Aggregator - Consolidar de múltiples bancos]
+            CACHE[Cache Service - Datos recientes en cache]
+            NORM[Normalizer - Normalizar formatos entre bancos]
         end
 
         subgraph "Support Services"
@@ -512,7 +512,7 @@ stateDiagram-v2
 ```mermaid
 graph TB
     subgraph "Account Aggregation Microservice"
-        API[API Layer\nREST Controllers]
+        API[API Layer - REST Controllers]
         
         subgraph "Business Logic"
             CONSENT[Consent Service]

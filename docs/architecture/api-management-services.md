@@ -14,12 +14,12 @@ graph TB
     end
 
     subgraph "API Management Layer"
-        WAF[WAF\nFiltrado L7]
-        GW[API Gateway\nEnvoy/NGINX]
+        WAF[WAF - Filtrado L7]
+        GW[API Gateway - Envoy/NGINX]
         
         subgraph "Políticas del Gateway"
             MTLS[mTLS Enforcement]
-            TOKEN[Token Validation\nJWT/FAPI]
+            TOKEN[Token Validation - JWT/FAPI]
             RATE[Rate Limiting]
             CONSENT_CHECK[Consent Validation]
             ROUTE[Routing & Versioning]
@@ -30,7 +30,7 @@ graph TB
     end
 
     subgraph "Servicios Internos"
-        AS[Authorization Server\nFAPI 2.0]
+        AS[Authorization Server - FAPI 2.0]
         CM[Consent Manager]
         PI[Payment Initiation]
         AA[Account Aggregation]
@@ -132,12 +132,12 @@ sequenceDiagram
 ```mermaid
 graph LR
     REQ[Request + Bearer Token] --> PARSE[Parsear JWT]
-    PARSE --> SIG[Verificar Firma\nJWKS endpoint]
+    PARSE --> SIG[Verificar Firma - JWKS endpoint]
     SIG --> EXP[Verificar Expiración]
     EXP --> ISS[Verificar Issuer]
     ISS --> AUD[Verificar Audience]
     AUD --> SCOPE[Verificar Scope]
-    SCOPE --> BIND[Certificate Binding\ncnf vs mTLS cert]
+    SCOPE --> BIND[Certificate Binding - cnf vs mTLS cert]
     BIND --> OK[Token Válido ✓]
     
     SIG -->|Inválido| REJECT[401 Unauthorized]
@@ -518,13 +518,13 @@ graph TB
     end
 
     subgraph "API Gateway Layer (Kubernetes)"
-        ISTIO_GW[Istio Ingress Gateway\nmTLS termination]
-        ENVOY[Envoy Sidecar\nen cada pod]
+        ISTIO_GW[Istio Ingress Gateway - mTLS termination]
+        ENVOY[Envoy Sidecar - en cada pod]
         
         subgraph "Control Plane"
-            ISTIOD[Istiod\nConfig + certs]
-            RLS[Rate Limit Service\nRedis-backed]
-            EXT_AUTH[External Auth Service\nToken + Consent validation]
+            ISTIOD[Istiod - Config + certs]
+            RLS[Rate Limit Service - Redis-backed]
+            EXT_AUTH[External Auth Service - Token + Consent validation]
         end
     end
 

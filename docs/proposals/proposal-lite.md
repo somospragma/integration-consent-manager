@@ -13,11 +13,11 @@ Un acelerador es un componente de software listo para desplegar que resuelve una
 ```mermaid
 graph LR
     subgraph "Acelerador"
-        HC[Helm Chart\nDespliegue K8s]
-        TF[Terraform Module\nInfraestructura]
-        DI[Docker Image\nMicroservicio]
-        OA[OpenAPI Spec\nContrato]
-        DOC[Documentación\nGuía de uso]
+        HC[Helm Chart - Despliegue K8s]
+        TF[Terraform Module - Infraestructura]
+        DI[Docker Image - Microservicio]
+        OA[OpenAPI Spec - Contrato]
+        DOC[Documentación - Guía de uso]
     end
 
     HC --> K8S[Kubernetes del Cliente]
@@ -59,21 +59,21 @@ Lo que mantenemos nosotros para que el cliente vea y pruebe:
 graph TB
     subgraph "Portal Público - openfinance-accelerators.com"
         subgraph "Secciones del Portal"
-            LAND[Landing\n¿Qué es Open Finance?\n¿Qué son los aceleradores?]
-            CAT[Catálogo\nLista de aceleradores\ncon descripción y pricing]
-            DEMO[Demo Interactiva\nVideos + flujos animados\nde cada acelerador]
-            DOCS[Documentación\nOpenAPI specs\nGuías de integración]
-            SAND[Sandbox\nProbar APIs en vivo\ncon datos mock]
-            REG[Registro\nCrear cuenta\nObtener API keys de prueba]
+            LAND[Landing - ¿Qué es Open Finance? - ¿Qué son los aceleradores?]
+            CAT[Catálogo - Lista de aceleradores - con descripción y pricing]
+            DEMO[Demo Interactiva - Videos + flujos animados - de cada acelerador]
+            DOCS[Documentación - OpenAPI specs - Guías de integración]
+            SAND[Sandbox - Probar APIs en vivo - con datos mock]
+            REG[Registro - Crear cuenta - Obtener API keys de prueba]
         end
     end
 
     subgraph "Sandbox Backend (1 nube)"
         SB_GW[API Gateway]
-        SB_CM[Consent Manager\nmodo demo]
-        SB_AS[Auth Server\nmodo demo]
-        SB_PI[Payment API\ndatos mock]
-        SB_AA[Accounts API\ndatos mock]
+        SB_CM[Consent Manager - modo demo]
+        SB_AS[Auth Server - modo demo]
+        SB_PI[Payment API - datos mock]
+        SB_AA[Accounts API - datos mock]
         SB_DB[(DB con datos ficticios)]
     end
 
@@ -166,9 +166,9 @@ graph TB
         end
 
         subgraph "Sandbox"
-            EKS_SB[EKS - 3 nodos\n4vCPU / 16GB cada uno]
-            RDS_SB[(RDS PostgreSQL\ndb.t3.medium)]
-            REDIS_SB[(ElastiCache Redis\ncache.t3.small)]
+            EKS_SB[EKS - 3 nodos - 4vCPU / 16GB cada uno]
+            RDS_SB[(RDS PostgreSQL - db.t3.medium)]
+            REDIS_SB[(ElastiCache Redis - cache.t3.small)]
         end
 
         subgraph "CI/CD"

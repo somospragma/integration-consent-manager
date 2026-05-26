@@ -26,35 +26,35 @@ El Authorization Server es el componente responsable de emitir, validar y gestio
 graph TB
     subgraph "Authorization Server"
         subgraph "Endpoints (Públicos)"
-            DISC[Discovery Endpoint\n/.well-known/openid-configuration]
-            JWKS[JWKS Endpoint\n/.well-known/jwks.json]
-            PAR_EP[PAR Endpoint\n/par]
-            AUTH[Authorize Endpoint\n/authorize]
-            TOKEN[Token Endpoint\n/token]
-            REVOKE[Revoke Endpoint\n/revoke]
-            INTROSPECT[Introspect Endpoint\n/introspect]
-            USERINFO[UserInfo Endpoint\n/userinfo]
-            DCR[Dynamic Client Registration\n/register]
+            DISC[Discovery Endpoint - /.well-known/openid-configuration]
+            JWKS[JWKS Endpoint - /.well-known/jwks.json]
+            PAR_EP[PAR Endpoint - /par]
+            AUTH[Authorize Endpoint - /authorize]
+            TOKEN[Token Endpoint - /token]
+            REVOKE[Revoke Endpoint - /revoke]
+            INTROSPECT[Introspect Endpoint - /introspect]
+            USERINFO[UserInfo Endpoint - /userinfo]
+            DCR[Dynamic Client Registration - /register]
         end
 
         subgraph "Servicios Internos"
-            CLIENT_AUTH[Client Authentication\nprivate_key_jwt / mTLS]
-            CONSENT_INT[Consent Integration\nVincular consent con token]
-            TOKEN_SVC[Token Service\nEmisión JWT firmado]
-            SCA_SVC[SCA Service\nStrong Customer Authentication]
-            KEY_MGR[Key Management\nRotación de claves]
-            SESSION_MGR[Session Management\nAuth codes, refresh tokens]
-            GRANT_MGR[Grant Management\nGestión de grants activos]
+            CLIENT_AUTH[Client Authentication - private_key_jwt / mTLS]
+            CONSENT_INT[Consent Integration - Vincular consent con token]
+            TOKEN_SVC[Token Service - Emisión JWT firmado]
+            SCA_SVC[SCA Service - Strong Customer Authentication]
+            KEY_MGR[Key Management - Rotación de claves]
+            SESSION_MGR[Session Management - Auth codes, refresh tokens]
+            GRANT_MGR[Grant Management - Gestión de grants activos]
         end
     end
 
     subgraph "Dependencias"
         CM[Consent Manager]
-        DIR[Directory Service\nTPP Registry]
-        VAULT[HashiCorp Vault\nClaves privadas]
-        REDIS[(Redis\nSessions, codes)]
-        PG[(PostgreSQL\nClients, grants)]
-        IDP[Identity Provider\nAutenticación del usuario]
+        DIR[Directory Service - TPP Registry]
+        VAULT[HashiCorp Vault - Claves privadas]
+        REDIS[(Redis - Sessions, codes)]
+        PG[(PostgreSQL - Clients, grants)]
+        IDP[Identity Provider - Autenticación del usuario]
     end
 
     PAR_EP --> CLIENT_AUTH
@@ -439,10 +439,10 @@ Permite a TPPs registrarse automáticamente presentando un SSA firmado por el di
 ```mermaid
 graph LR
     REQ[Request + client_assertion] --> PARSE[Parsear JWT]
-    PARSE --> DIR[Obtener JWKS del TPP\ndesde Directorio]
+    PARSE --> DIR[Obtener JWKS del TPP - desde Directorio]
     DIR --> VERIFY[Verificar firma]
-    VERIFY --> CLAIMS[Validar claims\niss, sub, aud, exp, jti]
-    CLAIMS --> REPLAY[Check replay\njti no usado antes]
+    VERIFY --> CLAIMS[Validar claims - iss, sub, aud, exp, jti]
+    CLAIMS --> REPLAY[Check replay - jti no usado antes]
     REPLAY --> OK[TPP Autenticado ✓]
 ```
 
@@ -633,7 +633,7 @@ Cada vez que se usa un refresh token, se emite uno nuevo y el anterior se invali
 graph LR
     RT1[Refresh Token 1] -->|Uso| RT2[Refresh Token 2 + nuevo Access Token]
     RT2 -->|Uso| RT3[Refresh Token 3 + nuevo Access Token]
-    RT1 -->|Reuso detectado| REVOKE[REVOCAR TODO\nPosible compromiso]
+    RT1 -->|Reuso detectado| REVOKE[REVOCAR TODO - Posible compromiso]
 ```
 
 ---
@@ -683,7 +683,7 @@ sequenceDiagram
     participant RS as Resource Server (API)
 
     Note over TPP,RS: Paso 1: PAR (Pushed Authorization Request)
-    TPP->>AS: POST /par\n(mTLS + private_key_jwt + request params + PKCE)
+    TPP->>AS: POST /par - (mTLS + private_key_jwt + request params + PKCE)
     AS->>AS: Autenticar TPP (private_key_jwt)
     AS->>AS: Validar parámetros
     AS->>CM: Crear/vincular consent
@@ -701,14 +701,14 @@ sequenceDiagram
     AS-->>U: Redirect con code + iss (JARM)
 
     Note over TPP,RS: Paso 3: Token Exchange
-    TPP->>AS: POST /token\n(mTLS + private_key_jwt + code + code_verifier)
+    TPP->>AS: POST /token - (mTLS + private_key_jwt + code + code_verifier)
     AS->>AS: Validar code + PKCE
     AS->>AS: Validar client authentication
     AS->>AS: Certificate binding (cnf claim)
     AS-->>TPP: {access_token (JWT), refresh_token, id_token}
 
     Note over TPP,RS: Paso 4: API Access
-    TPP->>RS: GET /accounts\n(mTLS + Bearer access_token)
+    TPP->>RS: GET /accounts - (mTLS + Bearer access_token)
     RS->>RS: Validar JWT (firma, exp, scope)
     RS->>RS: Certificate binding (cnf == cert presentado)
     RS->>CM: Validar consent activo

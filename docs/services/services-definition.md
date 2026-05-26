@@ -12,34 +12,34 @@ El Consent Manager es el componente central que gestiona el ciclo de vida comple
 graph TB
     subgraph "Consent Manager - Servicios"
         subgraph "Core Services"
-            CLS[Consent Lifecycle Service\nCrear, autorizar, revocar, expirar]
-            CQS[Consent Query Service\nBuscar, filtrar, paginar]
-            CAS[Consent Authorization Service\nIntegración con Auth Server]
+            CLS[Consent Lifecycle Service - Crear, autorizar, revocar, expirar]
+            CQS[Consent Query Service - Buscar, filtrar, paginar]
+            CAS[Consent Authorization Service - Integración con Auth Server]
         end
 
         subgraph "Management Services"
-            PMS[Permission & Scope Service\nGestión de permisos]
-            PPS[Purpose Service\nPropósitos de uso de datos]
-            EXP[Expiration Service\nTTL y expiración automática]
+            PMS[Permission & Scope Service - Gestión de permisos]
+            PPS[Purpose Service - Propósitos de uso de datos]
+            EXP[Expiration Service - TTL y expiración automática]
         end
 
         subgraph "Event & Audit Services"
-            EVT[Event Service\nWebhooks y notificaciones]
-            AUD[Audit Service\nLogs inmutables]
-            MET[Metrics Service\nAnalytics y dashboards]
+            EVT[Event Service - Webhooks y notificaciones]
+            AUD[Audit Service - Logs inmutables]
+            MET[Metrics Service - Analytics y dashboards]
         end
 
         subgraph "Integration Services"
-            TPP[TPP Registry Integration\nDirectorio de participantes]
-            USR[User Interface Service\nCMI para usuario final]
-            ADM[Admin Service\nPortal de administración]
+            TPP[TPP Registry Integration - Directorio de participantes]
+            USR[User Interface Service - CMI para usuario final]
+            ADM[Admin Service - Portal de administración]
         end
     end
 
     subgraph "Dependencias"
         DB[(PostgreSQL)]
         CACHE[(Redis)]
-        QUEUE[Event Bus\nKafka/NATS]
+        QUEUE[Event Bus - Kafka/NATS]
         AUTH[Authorization Server]
         VAULT[Vault - Secrets]
     end
