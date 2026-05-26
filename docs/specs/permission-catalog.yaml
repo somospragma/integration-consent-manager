@@ -1,0 +1,174 @@
+openapi: 3.1.0
+info:
+  title: Permission Catalog API
+  description: |
+    Catálogo de permisos y validación de acceso.
+    BIAN Domain: Customer Products and Services.
+  version: 1.0.0
+  contact:
+    name: Integration Chapter - Pragma
+
+servers:
+  - url: http://localhost:8080/v1
+    description: Local (desarrollo)
+  - url: https://api.openfinance.example.com/v1
+    description: Production
+  - url: https://sandbox.openfinance.example.com/v1
+    description: Sandbox
+
+
+paths:
+  /permissions:
+    get:
+      operationId: listPermissions
+      summary: Catálogo de permisos disponibles
+      tags: [Permission Catalog]
+      parameters:
+        - name: type
+          in: query
+          description: Filtrar por tipo de consentimiento
+          schema:
+            type: string
+            enum: [ACCOUNTS, PAYMENTS, FUNDS_CONFIRMATION]
+      responses:
+        '200':
+          description: Lista de permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionListResponse'
+
+  /permissions/validate:
+    get:
+      operationId: validatePermission
+      summary: Validar si un permiso es suficiente para un endpoint
+      description: Usado por el API Gateway en cada request para enforcement
+      tags: [Permission Validation]
+      parameters:
+        - name: permission
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: httpMethod
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [GET, POST, PUT, PATCH, DELETE]
+        - name: endpoint
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Resultado de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationResponse'
+
+  /purposes:
+    get:
+      operationId: listPurposes
+      summary: Catálogo de propósitos de uso de datos
+      tags: [Purpose Catalog]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurposeListResponse'
+    post:
+      operationId: createPurpose
+      summary: Crear nuevo propósito (admin)
+      tags: [Purpose Catalog]
+      security:
+        - AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePurposeRequest'
+      responses:
+        '201':
+          description: Propósito creado
+
+components:
+  securitySchemes:
+    AdminAuth:
+      type: http
+      scheme: bearer
+      description: JWT con rol ADMIN
+
+  schemas:
+    PermissionListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+
+    Permission:
+      type: object
+      properties:
+        code:
+          type: string
+          example: READ_ACCOUNTS_BASIC
+        name:
+          type: string
+          example: Lectura básica de cuentas
+        description:
+          type: string
+        consentType:
+          type: string
+          enum: [ACCOUNTS, PAYMENTS, FUNDS_CONFIRMATION]
+        active:
+          type: boolean
+
+    ValidationResponse:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        requestedPermission:
+          type: string
+        requiredPermission:
+          type: string
+        endpoint:
+          type: string
+
+    PurposeListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Purpose'
+
+    Purpose:
+      type: object
+      properties:
+        code:
+          type: string
+          example: ACCOUNT_INFORMATION
+        name:
+          type: string
+        description:
+          type: string
+        active:
+          type: boolean
+
+    CreatePurposeRequest:
+      type: object
+      required: [code, name]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        description:
+          type: string

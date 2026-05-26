@@ -1,0 +1,231 @@
+openapi: 3.1.0
+info:
+  title: Webhook Management API
+  description: |
+    API para gestión de webhooks del Consent Manager.
+    BIAN Domain: Party Data Management.
+    Permite a TPPs registrar callbacks para eventos de consentimiento.
+  version: 1.0.0
+  contact:
+    name: Integration Chapter - Pragma
+
+servers:
+  - url: http://localhost:8080/v1
+    description: Local (desarrollo)
+  - url: https://api.openfinance.example.com/v1
+    description: Production
+  - url: https://sandbox.openfinance.example.com/v1
+    description: Sandbox
+
+
+security:
+  - BearerAuth: []
+  - mTLS: []
+
+paths:
+  /webhooks:
+    post:
+      operationId: registerWebhook
+      summary: Registrar nuevo webhook
+      tags: [Webhook Management]
+      parameters:
+        - $ref: '#/components/parameters/XFapiInteractionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterWebhookRequest'
+      responses:
+        '201':
+          description: Webhook registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+    get:
+      operationId: listWebhooks
+      summary: Listar webhooks del TPP
+      tags: [Webhook Management]
+      responses:
+        '200':
+          description: Lista de webhooks
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/WebhookResponse'
+
+  /webhooks/{webhookId}:
+    get:
+      operationId: getWebhook
+      summary: Obtener detalle de un webhook
+      tags: [Webhook Management]
+      parameters:
+        - $ref: '#/components/parameters/WebhookId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      operationId: deleteWebhook
+      summary: Eliminar webhook
+      tags: [Webhook Management]
+      parameters:
+        - $ref: '#/components/parameters/WebhookId'
+      responses:
+        '204':
+          description: Webhook eliminado
+
+  /webhooks/{webhookId}/deliveries:
+    get:
+      operationId: getDeliveries
+      summary: Historial de entregas
+      tags: [Webhook Deliveries]
+      parameters:
+        - $ref: '#/components/parameters/WebhookId'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryListResponse'
+
+  /webhooks/{webhookId}/test:
+    post:
+      operationId: testWebhook
+      summary: Enviar payload de prueba
+      tags: [Webhook Management]
+      parameters:
+        - $ref: '#/components/parameters/WebhookId'
+      responses:
+        '200':
+          description: Test enviado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delivered:
+                    type: boolean
+                  httpStatus:
+                    type: integer
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    mTLS:
+      type: mutualTLS
+
+  parameters:
+    WebhookId:
+      name: webhookId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "550e8400-e29b-41d4-a716-446655440000"
+    XFapiInteractionId:
+      name: X-Fapi-Interaction-Id
+      in: header
+      required: true
+      schema:
+        type: string
+        example: "550e8400-e29b-41d4-a716-446655440000"
+
+  schemas:
+    RegisterWebhookRequest:
+      type: object
+      required: [url, eventTypes]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: HTTPS URL for callback (no localhost, no private IPs)
+        eventTypes:
+          type: array
+          items:
+            type: string
+            enum:
+              - consent.created
+              - consent.authorized
+              - consent.rejected
+              - consent.revoked
+              - consent.expired
+              - consent.consumed
+              - "*"
+
+    WebhookResponse:
+      type: object
+      properties:
+        webhookId:
+          type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        url:
+          type: string
+        eventTypes:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, FAILED]
+        secret:
+          type: string
+          description: HMAC secret (only returned on creation)
+        createdAt:
+          type: string
+          format: date-time
+
+    DeliveryListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              deliveryId:
+                type: string
+                example: "550e8400-e29b-41d4-a716-446655440000"
+              eventType:
+                type: string
+              status:
+                type: string
+                enum: [DELIVERED, FAILED, PENDING, DEAD_LETTER]
+              httpStatusCode:
+                type: integer
+              retryCount:
+                type: integer
+              createdAt:
+                type: string
+                format: date-time
+
+  responses:
+    BadRequest:
+      description: Request inválido
+    NotFound:
+      description: Webhook no encontrado
