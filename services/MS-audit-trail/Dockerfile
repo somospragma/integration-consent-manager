@@ -5,7 +5,7 @@ LABEL service="ms-audit-trail"
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
-COPY target/ms-audit-trail-*.jar app.jar
+COPY build/libs/ms-audit-trail-*.jar app.jar
 RUN chown -R appuser:appgroup /app
 USER appuser
 

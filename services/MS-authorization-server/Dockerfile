@@ -5,7 +5,7 @@ LABEL service="ms-authorization-server"
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
-COPY target/ms-authorization-server-*.jar app.jar
+COPY build/libs/ms-authorization-server-*.jar app.jar
 RUN chown -R appuser:appgroup /app
 USER appuser
 

@@ -5,7 +5,7 @@ LABEL service="ms-permission-registry"
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
-COPY target/ms-permission-registry-*.jar app.jar
+COPY build/libs/ms-permission-registry-*.jar app.jar
 RUN chown -R appuser:appgroup /app
 USER appuser
 

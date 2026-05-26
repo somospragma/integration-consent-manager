@@ -7,7 +7,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 WORKDIR /app
 
-COPY target/ms-consent-engine-*.jar app.jar
+COPY build/libs/ms-consent-engine-*.jar app.jar
 
 RUN chown -R appuser:appgroup /app
 

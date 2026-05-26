@@ -5,7 +5,7 @@ LABEL service="orch-payment-consent"
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
-COPY target/orch-payment-consent-*.jar app.jar
+COPY build/libs/orch-payment-consent-*.jar app.jar
 RUN chown -R appuser:appgroup /app
 USER appuser
 

@@ -5,7 +5,7 @@ LABEL service="orch-consent-flow"
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /app
-COPY target/orch-consent-flow-*.jar app.jar
+COPY build/libs/orch-consent-flow-*.jar app.jar
 RUN chown -R appuser:appgroup /app
 USER appuser
 
