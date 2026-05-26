@@ -11,7 +11,7 @@ Plataforma de gestión de consentimientos para ecosistemas de **Open Finance**. 
 Alineado con:
 - Decreto 0368 de 2026 (Colombia)
 - FAPI 2.0 Security Profile
-- Open Banking UK Read/Write API v4.0
+- Open Banking API v4.0
 - ISO 20022
 
 ## Arquitectura
@@ -40,39 +40,52 @@ Alineado con:
 ## Estructura del Repositorio
 
 ```
-├── docs/                    # Documentación completa
-│   ├── architecture/        # Diagramas y decisiones
-│   ├── adrs/                # Architecture Decision Records
-│   ├── security/            # Modelo de seguridad
-│   ├── services/            # Definición de servicios
-│   └── proposals/           # Propuestas de negocio
-├── apis/                    # OpenAPI Specs por API
+├── docs/                        # Documentación completa
+│   ├── architecture/            # Diagramas, API management, auth server, costos
+│   ├── adrs/                    # Architecture Decision Records
+│   ├── security/                # Modelo de seguridad FAPI 2.0
+│   ├── services/                # Catálogo de APIs, definición de servicios
+│   └── proposals/               # Propuestas de negocio
+├── apis/                        # OpenAPI 3.1 Specs (11 APIs)
 │   ├── API-consent-lifecycle/
-│   ├── API-consent-authorization/
 │   ├── API-consent-query/
-│   └── API-consent-admin/
-├── services/                # Código fuente de microservicios
+│   ├── API-webhook-management/
+│   ├── API-permission-catalog/
+│   ├── API-consent-authorization/
+│   ├── API-consent-admin/
+│   ├── API-audit/
+│   ├── API-consent-flow/
+│   ├── API-payment-consent-flow/
+│   ├── API-authorization-server/
+│   └── API-client-registration/
+├── services/                    # Microservicios (Java 21 + Spring Boot)
 │   ├── MS-consent-engine/
 │   ├── MS-audit-trail/
 │   ├── MS-notification-dispatcher/
-│   └── MS-permission-registry/
-├── orchestrators/           # Orquestadores (Sagas)
+│   ├── MS-permission-registry/
+│   └── MS-authorization-server/
+├── orchestrators/               # Orquestadores (Saga pattern)
 │   ├── ORCH-consent-flow/
 │   └── ORCH-payment-consent/
-├── infrastructure/          # Terraform (AWS, multi-nube ready)
-├── developer-portal/        # Portal (Redoc + GitHub Pages)
-└── docker-compose.yml       # Desarrollo local
+├── infrastructure/              # Terraform (AWS, costo-eficiente)
+├── developer-portal/            # Portal interactivo (Swagger UI)
+└── docker-compose.yml           # Desarrollo local
 ```
 
-## Nomenclatura
+## Proveedores Integrados
 
-| Prefijo | Tipo | Descripción |
-|---|---|---|
-| `API-` | API REST | Interfaz expuesta (OpenAPI spec) |
-| `MS-` | Microservicio | Servicio con responsabilidad única |
-| `ORCH-` | Orquestador | Coordina múltiples MS (Saga pattern) |
+| Herramienta | Rol |
+|---|---|
+| Raidiam | Directory + PKI + DCR |
+| Authlete / Curity / Cloudentity / Ping | Authorization Server FAPI 2.0 |
+| Transmit Security | SCA: Biometrics + Passkeys |
+| ConnectID | Identity Verification (KYC) |
 
-## Quick Start
+## Developer Portal
+
+🌐 **[Ver Portal](https://somospragma.github.io/integration-consent-manager/)**
+
+Portal interactivo con Swagger UI para probar las APIs directamente.
 
 ```bash
 # 1. Levantar dependencias
@@ -104,13 +117,15 @@ curl http://localhost:8080/actuator/health
 
 | Documento | Descripción |
 |---|---|
-| [Catálogo de APIs](docs/services/api-catalog.md) | 49 endpoints, seguridad BIAN/ISO 20022/FAPI 2.0 |
-| [Arquitectura](docs/architecture/architecture.md) | Diagramas y componentes |
+| [Catálogo de APIs](docs/services/api-catalog.md) | 11 APIs, 49+ endpoints, BIAN/ISO 20022/FAPI 2.0 |
+| [Arquitectura](docs/architecture/architecture.md) | Diagramas de componentes e infraestructura |
+| [Authorization Server](docs/architecture/authorization-server-services.md) | FAPI 2.0, PAR, tokens, DCR |
+| [API Management](docs/architecture/api-management-services.md) | Gateway, mTLS, rate limiting |
 | [Seguridad](docs/security/api-security.md) | Modelo de seguridad completo |
-| [Servicios](docs/services/services-definition.md) | Definición técnica de servicios |
+| [Proveedores](docs/architecture/identity-providers-integration.md) | Authlete, Curity, Raidiam, etc. |
+| [Servicios](docs/services/services-definition.md) | Definición técnica de microservicios |
 | [ADRs](docs/adrs/) | Decisiones de arquitectura |
-| [Costos](docs/architecture/cost-analysis.md) | Análisis de costos |
-| [Propuesta Lite](docs/proposals/proposal-lite.md) | Modelo de aceleradores |
+| [Costos](docs/architecture/cost-analysis.md) | Análisis de costos (~$650/mes prod) |
 
 ## Equipo
 

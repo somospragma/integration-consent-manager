@@ -77,9 +77,9 @@ Punto de entrada único para todas las peticiones:
 ```mermaid
 graph TB
     subgraph "Developer Portal"
-        DP[Portal Estático<br/>React/Astro]
-        SB[Sandbox<br/>Ambiente Aislado]
-        DOCS[API Docs<br/>OpenAPI Specs]
+        DP[Portal Estático\nReact/Astro]
+        SB[Sandbox\nAmbiente Aislado]
+        DOCS[API Docs\nOpenAPI Specs]
     end
 
     subgraph "API Gateway Layer"
@@ -91,7 +91,7 @@ graph TB
     subgraph "Service Mesh - Istio"
         subgraph "Core Services"
             CM[Consent Manager]
-            AS[Authorization Server<br/>FAPI 2.0]
+            AS[Authorization Server\nFAPI 2.0]
             PI[Payment Initiation API]
             AA[Account Aggregation API]
             DS[Directory Service]

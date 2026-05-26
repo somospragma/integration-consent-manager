@@ -5,17 +5,17 @@
 ```mermaid
 graph TB
     subgraph "Capa de Abstracción - Terraform"
-        TF[Terraform Modules<br/>Cloud Agnostic]
+        TF[Terraform Modules\nCloud Agnostic]
     end
 
     subgraph "AWS - Region sa-east-1"
         subgraph "VPC AWS"
             ALB_AWS[Application Load Balancer]
             subgraph "EKS Cluster"
-                EKS_NG[Node Group<br/>Auto Scaling]
+                EKS_NG[Node Group\nAuto Scaling]
                 EKS_PODS[Pods - Microservicios]
             end
-            RDS_AWS[(RDS PostgreSQL<br/>Multi-AZ)]
+            RDS_AWS[(RDS PostgreSQL\nMulti-AZ)]
             EC_AWS[(ElastiCache Redis)]
             S3_AWS[(S3 - Logs/Docs)]
         end
@@ -28,10 +28,10 @@ graph TB
         subgraph "VNet Azure"
             ALB_AZ[Azure Load Balancer]
             subgraph "AKS Cluster"
-                AKS_NG[Node Pool<br/>Auto Scaling]
+                AKS_NG[Node Pool\nAuto Scaling]
                 AKS_PODS[Pods - Microservicios]
             end
-            PG_AZ[(Azure DB PostgreSQL<br/>HA)]
+            PG_AZ[(Azure DB PostgreSQL\nHA)]
             RD_AZ[(Azure Cache Redis)]
             BLOB_AZ[(Blob Storage)]
         end
@@ -44,10 +44,10 @@ graph TB
         subgraph "VPC GCP"
             GLB_GCP[Cloud Load Balancer]
             subgraph "GKE Cluster"
-                GKE_NG[Node Pool<br/>Auto Scaling]
+                GKE_NG[Node Pool\nAuto Scaling]
                 GKE_PODS[Pods - Microservicios]
             end
-            SQL_GCP[(Cloud SQL PostgreSQL<br/>HA)]
+            SQL_GCP[(Cloud SQL PostgreSQL\nHA)]
             MEM_GCP[(Memorystore Redis)]
             GCS_GCP[(GCS - Logs/Docs)]
         end
@@ -200,30 +200,30 @@ sequenceDiagram
 graph TB
     subgraph "Developer Portal - Sitio Estático"
         subgraph "Frontend"
-            HOME[Landing Page<br/>¿Qué es Open Finance?]
-            CAT[Catálogo de APIs<br/>Aceleradores disponibles]
-            DOCS_PAGE[Documentación<br/>OpenAPI Specs interactivas]
-            SANDBOX_UI[Sandbox UI<br/>Probar APIs en vivo]
-            ONBOARD[Onboarding<br/>Registro de entidad]
-            CONSOLE[Consola<br/>API Keys, métricas, logs]
+            HOME[Landing Page\n¿Qué es Open Finance?]
+            CAT[Catálogo de APIs\nAceleradores disponibles]
+            DOCS_PAGE[Documentación\nOpenAPI Specs interactivas]
+            SANDBOX_UI[Sandbox UI\nProbar APIs en vivo]
+            ONBOARD[Onboarding\nRegistro de entidad]
+            CONSOLE[Consola\nAPI Keys, métricas, logs]
         end
     end
 
     subgraph "Backend del Portal"
-        AUTH_P[Auth Portal<br/>Login entidades]
-        KEY_MGR[Key Manager<br/>Generación de credenciales]
-        METRICS[Métricas de uso<br/>Dashboard por entidad]
+        AUTH_P[Auth Portal\nLogin entidades]
+        KEY_MGR[Key Manager\nGeneración de credenciales]
+        METRICS[Métricas de uso\nDashboard por entidad]
     end
 
     subgraph "Sandbox Environment"
         SB_GW[Gateway Sandbox]
-        SB_MOCK[Mock Services<br/>Datos ficticios]
-        SB_CM[Consent Manager<br/>Modo prueba]
+        SB_MOCK[Mock Services\nDatos ficticios]
+        SB_CM[Consent Manager\nModo prueba]
     end
 
     subgraph "Hosting"
         CDN[CDN Global]
-        STATIC[Static Storage<br/>S3/Blob/GCS]
+        STATIC[Static Storage\nS3/Blob/GCS]
     end
 
     HOME --> CAT
@@ -252,11 +252,11 @@ graph LR
         LINT[Lint + SAST]
         TEST[Unit Tests]
         BUILD[Docker Build]
-        SCAN[Image Scan<br/>Vulnerabilidades]
+        SCAN[Image Scan\nVulnerabilidades]
     end
 
     subgraph "Registry"
-        REG[Container Registry<br/>ECR/ACR/AR]
+        REG[Container Registry\nECR/ACR/AR]
     end
 
     subgraph "Deploy - GitOps"
@@ -301,7 +301,7 @@ graph TB
     subgraph "Perimeter"
         WAF[WAF - Filtrado L7]
         DDOS[DDoS Protection]
-        GW[API Gateway<br/>mTLS + Token Validation]
+        GW[API Gateway\nmTLS + Token Validation]
     end
 
     subgraph "Service Mesh - Zero Trust"
@@ -311,13 +311,13 @@ graph TB
             S2[Auth Server]
             S3[Payment API]
         end
-        NP[Network Policies<br/>Deny All by Default]
+        NP[Network Policies\nDeny All by Default]
     end
 
     subgraph "Data Security"
-        VAULT[HashiCorp Vault<br/>Secrets]
-        KMS[KMS<br/>Encryption Keys]
-        AUDIT[(Audit Logs<br/>Inmutables)]
+        VAULT[HashiCorp Vault\nSecrets]
+        KMS[KMS\nEncryption Keys]
+        AUDIT[(Audit Logs\nInmutables)]
     end
 
     TPP -->|mTLS + JWT| WAF
@@ -346,24 +346,24 @@ graph TB
 graph TB
     subgraph "Ambientes"
         subgraph "Development"
-            DEV_K8S[K8s Cluster Pequeño<br/>1 nube]
+            DEV_K8S[K8s Cluster Pequeño\n1 nube]
             DEV_DB[(DB Dev)]
         end
 
         subgraph "Sandbox - Para Terceros"
-            SBX_K8S[K8s Cluster<br/>Datos Mock]
+            SBX_K8S[K8s Cluster\nDatos Mock]
             SBX_DB[(DB con datos ficticios)]
             SBX_PORTAL[Portal Sandbox]
         end
 
         subgraph "Staging"
-            STG_K8S[K8s Cluster<br/>Réplica de Prod]
+            STG_K8S[K8s Cluster\nRéplica de Prod]
             STG_DB[(DB Staging)]
         end
 
         subgraph "Production"
-            PROD_K8S[K8s Cluster HA<br/>Multi-AZ]
-            PROD_DB[(DB HA<br/>Multi-AZ + Backup)]
+            PROD_K8S[K8s Cluster HA\nMulti-AZ]
+            PROD_DB[(DB HA\nMulti-AZ + Backup)]
             PROD_PORTAL[Portal Producción]
         end
     end

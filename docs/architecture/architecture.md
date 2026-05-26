@@ -8,51 +8,51 @@ graph TB
         TPP1[TPP - Fintech]
         TPP2[TPP - Banco]
         USER[Usuario Final]
-        DEV[Desarrollador<br/>Developer Portal]
+        DEV[Desarrollador\nDeveloper Portal]
     end
 
     subgraph "Edge Layer"
-        GH_PAGES[GitHub Pages<br/>Developer Portal]
+        GH_PAGES[GitHub Pages\nDeveloper Portal]
         WAF[AWS WAF]
-        ALB[Application Load Balancer<br/>+ mTLS termination]
+        ALB[Application Load Balancer\n+ mTLS termination]
     end
 
     subgraph "AWS EKS Cluster"
         subgraph "Ingress"
-            ISTIO_GW[Istio Gateway<br/>Token + Consent validation]
+            ISTIO_GW[Istio Gateway\nToken + Consent validation]
         end
 
         subgraph "APIs (Namespace: consent-manager)"
-            API_LC[API-consent-lifecycle<br/>:8080]
-            API_AUTH[API-consent-authorization<br/>:8080]
-            API_QRY[API-consent-query<br/>:8080]
-            API_ADM[API-consent-admin<br/>:8080]
+            API_LC[API-consent-lifecycle\n:8080]
+            API_AUTH[API-consent-authorization\n:8080]
+            API_QRY[API-consent-query\n:8080]
+            API_ADM[API-consent-admin\n:8080]
         end
 
         subgraph "Microservicios"
-            MS_ENGINE[MS-consent-engine<br/>Core Logic + State Machine]
-            MS_AUDIT[MS-audit-trail<br/>Immutable Logs]
-            MS_NOTIF[MS-notification-dispatcher<br/>Webhooks]
-            MS_PERM[MS-permission-registry<br/>Permission Catalog]
+            MS_ENGINE[MS-consent-engine\nCore Logic + State Machine]
+            MS_AUDIT[MS-audit-trail\nImmutable Logs]
+            MS_NOTIF[MS-notification-dispatcher\nWebhooks]
+            MS_PERM[MS-permission-registry\nPermission Catalog]
         end
 
         subgraph "Orquestadores"
-            ORCH_FLOW[ORCH-consent-flow<br/>Account Consent Saga]
-            ORCH_PAY[ORCH-payment-consent<br/>Payment Consent Saga]
+            ORCH_FLOW[ORCH-consent-flow\nAccount Consent Saga]
+            ORCH_PAY[ORCH-payment-consent\nPayment Consent Saga]
         end
     end
 
     subgraph "Data Layer (AWS Managed - Serverless)"
-        AURORA[(Aurora Serverless v2<br/>PostgreSQL 16)]
-        REDIS[(ElastiCache Serverless<br/>Redis 7)]
-        MSK[MSK Serverless<br/>Kafka]
+        AURORA[(Aurora Serverless v2\nPostgreSQL 16)]
+        REDIS[(ElastiCache Serverless\nRedis 7)]
+        MSK[MSK Serverless\nKafka]
         SECRETS[Secrets Manager]
     end
 
     subgraph "Observability"
         CW[CloudWatch Logs]
-        PROM[Prometheus<br/>in-cluster]
-        GRAFANA[Grafana<br/>Dashboards]
+        PROM[Prometheus\nin-cluster]
+        GRAFANA[Grafana\nDashboards]
         SNS[SNS Alerts]
     end
 
@@ -115,24 +115,24 @@ graph TB
 graph LR
     subgraph "API Layer"
         direction TB
-        A1[API-consent-lifecycle<br/>POST/GET/DELETE /consents]
-        A2[API-consent-authorization<br/>validate/authorize/reject/active]
-        A3[API-consent-query<br/>list/history/by-user/by-tpp]
-        A4[API-consent-admin<br/>search/bulk-revoke/metrics/config]
+        A1[API-consent-lifecycle\nPOST/GET/DELETE /consents]
+        A2[API-consent-authorization\nvalidate/authorize/reject/active]
+        A3[API-consent-query\nlist/history/by-user/by-tpp]
+        A4[API-consent-admin\nsearch/bulk-revoke/metrics/config]
     end
 
     subgraph "Service Layer"
         direction TB
-        S1[MS-consent-engine<br/>• State Machine<br/>• CRUD<br/>• Expiration Job<br/>• Event Publisher]
-        S2[MS-audit-trail<br/>• Hash Chain<br/>• Kafka Consumer<br/>• Integrity Check]
-        S3[MS-notification-dispatcher<br/>• Webhook Registry<br/>• HMAC Signing<br/>• Retry + DLQ]
-        S4[MS-permission-registry<br/>• Permission Catalog<br/>• Endpoint Mapping<br/>• Validation]
+        S1[MS-consent-engine\n• State Machine\n• CRUD\n• Expiration Job\n• Event Publisher]
+        S2[MS-audit-trail\n• Hash Chain\n• Kafka Consumer\n• Integrity Check]
+        S3[MS-notification-dispatcher\n• Webhook Registry\n• HMAC Signing\n• Retry + DLQ]
+        S4[MS-permission-registry\n• Permission Catalog\n• Endpoint Mapping\n• Validation]
     end
 
     subgraph "Orchestration Layer"
         direction TB
-        O1[ORCH-consent-flow<br/>• PAR → Auth → Token<br/>• Saga + Compensation<br/>• Circuit Breaker]
-        O2[ORCH-payment-consent<br/>• Consent → Funds → Pay<br/>• Single-use consume<br/>• Payment execution]
+        O1[ORCH-consent-flow\n• PAR → Auth → Token\n• Saga + Compensation\n• Circuit Breaker]
+        O2[ORCH-payment-consent\n• Consent → Funds → Pay\n• Single-use consume\n• Payment execution]
     end
 
     A1 --> S1
@@ -155,35 +155,35 @@ graph TB
     subgraph "AWS Region: sa-east-1"
         subgraph "VPC: 10.x.0.0/16"
             subgraph "Public Subnets (2 AZs)"
-                ALB[ALB<br/>+ WAF]
+                ALB[ALB\n+ WAF]
                 NAT[NAT Gateway]
             end
 
             subgraph "Private Subnets (2 AZs)"
                 subgraph "EKS Cluster"
-                    NG[Node Group<br/>t3.medium (Spot/OnDemand)<br/>2-10 nodes]
+                    NG[Node Group\nt3.medium (Spot/OnDemand)\n2-10 nodes]
                 end
             end
 
             subgraph "Database Subnets (isolated)"
-                AURORA[(Aurora Serverless v2<br/>0.5-16 ACU<br/>PostgreSQL 16)]
+                AURORA[(Aurora Serverless v2\n0.5-16 ACU\nPostgreSQL 16)]
             end
         end
 
         subgraph "Serverless (VPC-connected)"
-            ECACHE[(ElastiCache Serverless<br/>Redis 7<br/>2-10 GB)]
-            KAFKA[MSK Serverless<br/>Kafka<br/>Pay per throughput]
+            ECACHE[(ElastiCache Serverless\nRedis 7\n2-10 GB)]
+            KAFKA[MSK Serverless\nKafka\nPay per throughput]
         end
 
         subgraph "Management"
             SM[Secrets Manager]
-            KMS[KMS<br/>Encryption Keys]
-            ECR[ECR<br/>Container Images]
-            CW_LOGS[CloudWatch Logs<br/>14d dev / 5y audit]
+            KMS[KMS\nEncryption Keys]
+            ECR[ECR\nContainer Images]
+            CW_LOGS[CloudWatch Logs\n14d dev / 5y audit]
         end
 
         subgraph "Edge"
-            GH[GitHub Pages<br/>Developer Portal<br/>$0/mes]
+            GH[GitHub Pages\nDeveloper Portal\n$0/mes]
         end
     end
 
@@ -202,7 +202,7 @@ graph TB
 ```mermaid
 flowchart LR
     subgraph "Entrada"
-        REQ[Request TPP<br/>mTLS + JWT]
+        REQ[Request TPP\nmTLS + JWT]
     end
 
     subgraph "Seguridad"
@@ -253,8 +253,8 @@ graph TB
         API_LC -->|HTTP| MS_ENGINE
         API_AUTH -->|HTTP| MS_ENGINE
         ORCH_FLOW -->|HTTP| MS_ENGINE
-        ORCH_FLOW -->|HTTP| AUTH_SERVER[Auth Server<br/>externo]
-        ORCH_PAY -->|HTTP| PAYMENT_SVC[Payment Service<br/>externo]
+        ORCH_FLOW -->|HTTP| AUTH_SERVER[Auth Server\nexterno]
+        ORCH_PAY -->|HTTP| PAYMENT_SVC[Payment Service\nexterno]
         ISTIO_GW -->|HTTP| MS_PERM
     end
 
@@ -330,16 +330,16 @@ graph TB
 ```mermaid
 graph LR
     subgraph "Horizontal Scaling"
-        HPA[HPA<br/>CPU > 70% → scale up]
-        CA[Cluster Autoscaler<br/>Pods pending → add node]
-        AURORA_S[Aurora<br/>0.5 → 16 ACU auto]
-        REDIS_S[Redis<br/>Auto-scale ECPU]
+        HPA[HPA\nCPU > 70% → scale up]
+        CA[Cluster Autoscaler\nPods pending → add node]
+        AURORA_S[Aurora\n0.5 → 16 ACU auto]
+        REDIS_S[Redis\nAuto-scale ECPU]
     end
 
     subgraph "Capacidad Estimada"
         C1[Dev: 100 req/seg]
         C2[Prod: 5,000 req/seg]
-        C3[Peak: 10,000 req/seg<br/>con autoscaling]
+        C3[Peak: 10,000 req/seg\ncon autoscaling]
     end
 
     HPA --> C1
