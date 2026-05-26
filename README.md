@@ -16,26 +16,73 @@ Alineado con:
 
 ## Arquitectura
 
+```mermaid
+graph TB
+    subgraph "Actores"
+        TPP[TPP - Fintech/Banco]
+        USER[Usuario Final]
+        ADMIN[Administrador]
+    end
+
+    subgraph "Consent Manager"
+        subgraph "APIs Externas"
+            A1[API Consent Lifecycle]
+            A2[API Consent Query]
+            A3[API Webhooks]
+            A4[API Permissions]
+        end
+        subgraph "APIs Internas"
+            A5[API Authorization]
+            A6[API Admin]
+            A7[API Audit]
+        end
+        subgraph "Microservicios"
+            MS1[MS Consent Engine]
+            MS2[MS Audit Trail]
+            MS3[MS Notifications]
+            MS4[MS Permission Registry]
+            MS5[MS Authorization Server]
+        end
+    end
+
+    subgraph "Infraestructura"
+        DB[(PostgreSQL)]
+        CACHE[(Redis)]
+        KAFKA[Kafka]
+    end
+
+    TPP -->|Crear/Consultar/Revocar| A1
+    TPP -->|Buscar consents| A2
+    TPP -->|Registrar callbacks| A3
+    TPP -->|Ver permisos| A4
+    USER -->|Autorizar/Rechazar| A5
+    ADMIN -->|Gestionar/Monitorear| A6
+    ADMIN -->|Auditar| A7
+
+    A1 --> MS1
+    A2 --> MS1
+    A3 --> MS3
+    A4 --> MS4
+    A5 --> MS1
+    A5 --> MS5
+    A6 --> MS1
+    A7 --> MS2
+
+    MS1 --> DB
+    MS1 --> CACHE
+    MS1 --> KAFKA
+    MS2 --> DB
+    MS3 --> KAFKA
+    MS5 --> CACHE
 ```
-                    ┌──────────────────────┐
-                    │   Developer Portal   │
-                    │   (GitHub Pages)     │
-                    └──────────┬───────────┘
-                               │
-┌──────────────────────────────▼───────────────────────────────┐
-│                      API Gateway (mTLS + JWT)                 │
-├──────────────────────────────────────────────────────────────┤
-│  API-consent-lifecycle │ API-consent-authorization            │
-│  API-consent-query     │ API-consent-admin                    │
-├──────────────────────────────────────────────────────────────┤
-│  MS-consent-engine     │ MS-audit-trail                       │
-│  MS-notification-dispatcher │ MS-permission-registry          │
-├──────────────────────────────────────────────────────────────┤
-│  ORCH-consent-flow     │ ORCH-payment-consent                 │
-├──────────────────────────────────────────────────────────────┤
-│  PostgreSQL (Aurora)   │ Redis (ElastiCache) │ Kafka (MSK)    │
-└──────────────────────────────────────────────────────────────┘
-```
+
+### Roles y Permisos
+
+| Actor | Qué puede hacer | APIs que usa |
+|---|---|---|
+| **TPP** | Crear, consultar y revocar consentimientos | Lifecycle, Query, Webhooks, Permissions |
+| **Usuario** | Autorizar o rechazar consentimientos, revocar | Authorization (via Auth Server) |
+| **Administrador** | Búsqueda avanzada, revocación masiva, métricas, auditoría | Admin, Audit |
 
 ## Proveedores Integrados
 
