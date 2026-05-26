@@ -1,0 +1,386 @@
+openapi: 3.1.0
+info:
+  title: Consent Admin API
+  description: |
+    API de administración para operadores de la entidad financiera.
+    Permite búsqueda avanzada, revocación administrativa y configuración.
+    Solo accesible desde red interna con rol ADMIN.
+  version: 1.0.0
+  contact:
+    name: Integration Chapter - Pragma
+servers:
+  - url: http://localhost:8080/v1
+    description: Local (desarrollo)
+  - url: https://api.openfinance.example.com/v1
+    description: Production
+  - url: https://sandbox.openfinance.example.com/v1
+    description: Sandbox
+
+
+security:
+  - AdminBearerAuth: []
+
+paths:
+  /admin/consents/search:
+    get:
+      operationId: adminSearchConsents
+      summary: Búsqueda avanzada sin restricciones
+      tags: [Admin Operations]
+      parameters:
+        - name: consentId
+          in: query
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: tppId
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: type
+          in: query
+          schema:
+            type: string
+        - name: fromDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: toDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Resultados de búsqueda
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminConsentListResponse'
+        '403':
+          description: Sin permisos de administrador
+
+  /admin/consents/{consentId}:
+    delete:
+      operationId: adminRevokeConsent
+      summary: Revocación administrativa
+      tags: [Admin Operations]
+      parameters:
+        - $ref: '#/components/parameters/ConsentId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRevokeRequest'
+      responses:
+        '200':
+          description: Consentimiento revocado por admin
+        '404':
+          description: No encontrado
+
+  /admin/consents/bulk-revoke:
+    post:
+      operationId: adminBulkRevoke
+      summary: Revocación masiva (ej. TPP suspendido)
+      tags: [Admin Operations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkRevokeRequest'
+      responses:
+        '202':
+          description: Operación aceptada (async)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkRevokeResponse'
+
+  /admin/metrics:
+    get:
+      operationId: getMetrics
+      summary: Métricas del consent manager
+      tags: [Monitoring]
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Métricas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+
+  /admin/config:
+    get:
+      operationId: getConfig
+      summary: Obtener configuración actual
+      tags: [Configuration]
+      responses:
+        '200':
+          description: Configuración
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigResponse'
+    put:
+      operationId: updateConfig
+      summary: Actualizar configuración
+      tags: [Configuration]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigUpdateRequest'
+      responses:
+        '200':
+          description: Configuración actualizada
+
+  /admin/health:
+    get:
+      operationId: healthCheck
+      summary: Health check completo
+      tags: [Health]
+      responses:
+        '200':
+          description: Servicio saludable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Servicio no saludable
+
+components:
+  securitySchemes:
+    AdminBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token con rol ADMIN o CUSTOMER_CARE_OFFICER
+
+  parameters:
+    ConsentId:
+      name: consentId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "550e8400-e29b-41d4-a716-446655440000"
+
+  schemas:
+    AdminConsentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdminConsentView'
+        meta:
+          type: object
+          properties:
+            totalCount:
+              type: integer
+            page:
+              type: integer
+            pageSize:
+              type: integer
+
+    AdminConsentView:
+      type: object
+      properties:
+        consentId:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+        userId:
+          type: string
+        tppId:
+          type: string
+        tppName:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        authorizedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        revokedAt:
+          type: string
+          format: date-time
+
+    AdminRevokeRequest:
+      type: object
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          enum: [TPP_SUSPENDED, SECURITY_INCIDENT, REGULATORY_ORDER, ADMIN_DECISION]
+        notes:
+          type: string
+
+    BulkRevokeRequest:
+      type: object
+      required: [criteria, reason]
+      properties:
+        criteria:
+          type: object
+          properties:
+            tppId:
+              type: string
+            status:
+              type: string
+            createdBefore:
+              type: string
+              format: date-time
+        reason:
+          type: string
+        dryRun:
+          type: boolean
+          default: true
+          description: Si true, solo retorna cuántos se afectarían
+
+    BulkRevokeResponse:
+      type: object
+      properties:
+        jobId:
+          type: string
+        affectedCount:
+          type: integer
+        status:
+          type: string
+          enum: [ACCEPTED, DRY_RUN_COMPLETE]
+
+    MetricsResponse:
+      type: object
+      properties:
+        totalConsents:
+          type: integer
+        activeConsents:
+          type: integer
+        consentsByStatus:
+          type: object
+          additionalProperties:
+            type: integer
+        consentsByType:
+          type: object
+          additionalProperties:
+            type: integer
+        authorizationRate:
+          type: number
+          format: float
+        avgLifetimeDays:
+          type: number
+        topTpps:
+          type: array
+          items:
+            type: object
+            properties:
+              tppId:
+                type: string
+              tppName:
+                type: string
+              consentCount:
+                type: integer
+
+    ConfigResponse:
+      type: object
+      properties:
+        ttl:
+          type: object
+          properties:
+            accountsDays:
+              type: integer
+            paymentsHours:
+              type: integer
+            fundsConfirmationHours:
+              type: integer
+        rateLimits:
+          type: object
+          properties:
+            perTppPerMinute:
+              type: integer
+            globalPerMinute:
+              type: integer
+        features:
+          type: object
+          properties:
+            webhooksEnabled:
+              type: boolean
+            bulkRevokeEnabled:
+              type: boolean
+
+    ConfigUpdateRequest:
+      type: object
+      properties:
+        ttl:
+          type: object
+          properties:
+            accountsDays:
+              type: integer
+            paymentsHours:
+              type: integer
+        rateLimits:
+          type: object
+          properties:
+            perTppPerMinute:
+              type: integer
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [UP, DOWN, DEGRADED]
+        components:
+          type: object
+          properties:
+            database:
+              type: string
+              enum: [UP, DOWN]
+            cache:
+              type: string
+              enum: [UP, DOWN]
+            kafka:
+              type: string
+              enum: [UP, DOWN]
+        timestamp:
+          type: string
+          format: date-time

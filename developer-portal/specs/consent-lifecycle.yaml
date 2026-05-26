@@ -6,10 +6,13 @@ info:
   contact:
     name: Integration Chapter - Pragma
 servers:
+  - url: http://localhost:8080/v1
+    description: Local (desarrollo)
   - url: https://api.openfinance.example.com/v1
     description: Production
   - url: https://sandbox.openfinance.example.com/v1
     description: Sandbox
+
 
 security:
   - BearerAuth: []
@@ -101,14 +104,14 @@ components:
       required: true
       schema:
         type: string
-        format: uuid
+        example: "550e8400-e29b-41d4-a716-446655440000"
     XFapiInteractionId:
       name: X-Fapi-Interaction-Id
       in: header
       required: true
       schema:
         type: string
-        format: uuid
+        example: "550e8400-e29b-41d4-a716-446655440000"
     XFapiAuthDate:
       name: X-Fapi-Auth-Date
       in: header
@@ -168,7 +171,7 @@ components:
           properties:
             consentId:
               type: string
-              format: uuid
+              example: "550e8400-e29b-41d4-a716-446655440000"
             type:
               type: string
             status:
