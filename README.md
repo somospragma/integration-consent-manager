@@ -125,20 +125,6 @@ curl http://localhost:8080/actuator/health
 | IaC | Terraform |
 | Seguridad | FAPI 2.0, mTLS, OAuth 2.0, JWT |
 
-## Documentación
-
-| Documento | Descripción |
-|---|---|
-| [Catálogo de APIs](docs/services/api-catalog.md) | 11 APIs, 49+ endpoints, BIAN/ISO 20022/FAPI 2.0 |
-| [Arquitectura](docs/architecture/architecture.md) | Diagramas de componentes e infraestructura |
-| [Authorization Server](docs/architecture/authorization-server-services.md) | FAPI 2.0, PAR, tokens, DCR |
-| [API Management](docs/architecture/api-management-services.md) | Gateway, mTLS, rate limiting |
-| [Seguridad](docs/security/api-security.md) | Modelo de seguridad completo |
-| [Proveedores](docs/architecture/identity-providers-integration.md) | Authlete, Curity, Raidiam, etc. |
-| [Servicios](docs/services/services-definition.md) | Definición técnica de microservicios |
-| [ADRs](docs/adrs/) | Decisiones de arquitectura |
-| [Costos](docs/architecture/cost-analysis.md) | Análisis de costos (~$650/mes prod) |
-
 ## Equipo
 
 Integration Chapter — Pragma
